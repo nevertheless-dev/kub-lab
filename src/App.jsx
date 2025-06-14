@@ -4,8 +4,8 @@ import axios from "axios";
 
 function App() {
   const [tasks, setTasks] = useState([]);
-  const [joke, setJoke] = useState("");
   const [quote, setQuote] = useState("");
+  const [joke, setJoke] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -22,19 +22,29 @@ function App() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }, [tasks]);
 
-  // Загрузка анекдота и цитаты
+  // Загрузка цитаты и анекдота
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 🃏 Анекдот
-        const jokeRes = await axios.get(
-          "https://api.rss2json.com/v1/api.json?rss_url=https://www.anekdot.ru/rss/export_j.xml"
+        // Цитата с quotable.io через прокси
+        const quoteRes = await axios.get(
+          "https://api.allorigins.win/get?url=" +
+            encodeURIComponent("https://api.quotable.io/random")
         );
-        setJoke(jokeRes.data.items[0].description);
+        const quoteJson = JSON.parse(quoteRes.data.contents);
+        setQuote(quoteJson.content);
 
-        // 💬 Цитата
-        const quoteRes = await axios.get("https://api.quotable.io/random");
-        setQuote(`"${quoteRes.data.content}" — ${quoteRes.data.author}`);
+        // Анекдот с anekdot.ru через прокси
+        const jokeRes = await axios.get(
+          "https://api.allorigins.win/get?url=" +
+            encodeURIComponent("https://www.anekdot.ru/rss/randomu.html")
+        );
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(jokeRes.data.contents, "text/html");
+        const text =
+          xml.querySelector("item description")?.innerHTML ||
+          "Анекдот не найден";
+        setJoke(text);
       } catch (err) {
         console.error("Ошибка при загрузке API:", err);
         setError("Не удалось загрузить данные");
@@ -74,21 +84,18 @@ function App() {
     <div className="app">
       <h1>Мои задачи ({tasks.length})</h1>
 
-      {/* Блок с анекдотом и цитатой */}
       {!loading && !error && (
         <div className="info">
           <div>
-            <strong>😂 Анекдот:</strong>
-            <div dangerouslySetInnerHTML={{ __html: joke }} />
+            <strong>🧠 Цитата дня:</strong> {quote}
           </div>
-          <div style={{ marginTop: "10px" }}>
-            <strong>💡 Цитата:</strong>
-            <div>{quote}</div>
+          <div>
+            <strong>😂 Анекдот:</strong>{" "}
+            <span dangerouslySetInnerHTML={{ __html: joke }} />
           </div>
         </div>
       )}
 
-      {/* Форма задач */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -100,7 +107,6 @@ function App() {
         <button type="submit">Добавить</button>
       </form>
 
-      {/* Список задач */}
       <div className="tasks">
         {tasks.map((task) => (
           <div key={task.id} className={`task ${task.done ? "done" : ""}`}>
