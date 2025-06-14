@@ -3,11 +3,9 @@ import "./App.css";
 import axios from "axios";
 
 function App() {
-  // Состояния
   const [tasks, setTasks] = useState([]);
-  const [usdRate, setUsdRate] = useState("");
-  const [eurRate, setEurRate] = useState("");
-  const [weather, setWeather] = useState(null);
+  const [joke, setJoke] = useState("");
+  const [quote, setQuote] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -24,26 +22,21 @@ function App() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }, [tasks]);
 
-  // Загрузка данных (курс валют и погода)
+  // Загрузка анекдота и цитаты
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Курс валют
-        const currency = await axios.get(
-          "https://www.cbr-xml-daily.ru/daily_json.js"
+        // 🃏 Анекдот
+        const jokeRes = await axios.get(
+          "https://api.rss2json.com/v1/api.json?rss_url=https://www.anekdot.ru/rss/export_j.xml"
         );
-        setUsdRate(currency.data.Valute.USD.Value.toFixed(2));
-        setEurRate(currency.data.Valute.EUR.Value.toFixed(2));
+        setJoke(jokeRes.data.items[0].description);
 
-        // Погода
-        navigator.geolocation.getCurrentPosition(async (position) => {
-          const { latitude, longitude } = position.coords;
-          const weatherData = await axios.get(
-            `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=c7616da4b68205c2f3ae73df2c31d177`
-          );
-          setWeather(weatherData.data);
-        });
+        // 💬 Цитата
+        const quoteRes = await axios.get("https://api.quotable.io/random");
+        setQuote(`"${quoteRes.data.content}" — ${quoteRes.data.author}`);
       } catch (err) {
+        console.error("Ошибка при загрузке API:", err);
         setError("Не удалось загрузить данные");
       } finally {
         setLoading(false);
@@ -53,7 +46,7 @@ function App() {
     fetchData();
   }, []);
 
-  // Функции для работы с задачами
+  // Функции для задач
   const addTask = (text) => {
     if (text.trim()) {
       const newTask = {
@@ -77,24 +70,25 @@ function App() {
     );
   };
 
-  // Рендер компонента
   return (
     <div className="app">
       <h1>Мои задачи ({tasks.length})</h1>
 
-      {/* Блок с курсами и погодой */}
+      {/* Блок с анекдотом и цитатой */}
       {!loading && !error && (
         <div className="info">
           <div>
-            $ {usdRate} руб. | € {eurRate} руб.
+            <strong>😂 Анекдот:</strong>
+            <div dangerouslySetInnerHTML={{ __html: joke }} />
           </div>
-          {weather && (
-            <div>Погода: {Math.round(weather.main.temp - 273.15)}°C</div>
-          )}
+          <div style={{ marginTop: "10px" }}>
+            <strong>💡 Цитата:</strong>
+            <div>{quote}</div>
+          </div>
         </div>
       )}
 
-      {/* Форма добавления задачи */}
+      {/* Форма задач */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
