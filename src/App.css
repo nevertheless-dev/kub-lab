@@ -67,6 +67,10 @@ button:hover {
   color: #e74c3c;
   font-weight: bold;
   padding: 0 5px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
 }
 
 .info {

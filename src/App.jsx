@@ -28,6 +28,7 @@ function App() {
       try {
         setCatImage("https://http.cat/404.jpg");
 
+        // Запрос случайного текста с baconipsum
         const textRes = await axios.get(
           "https://baconipsum.com/api/?type=meat-and-filler&paras=1"
         );
@@ -86,7 +87,11 @@ function App() {
             >
               {task.text}
             </span>
-            <button onClick={() => deleteTask(task.id)} className="task-delete">
+            <button
+              onClick={() => deleteTask(task.id)}
+              className="task-delete"
+              aria-label="Удалить задачу"
+            >
               ×
             </button>
           </div>
