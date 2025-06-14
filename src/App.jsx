@@ -26,24 +26,36 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Цитата с quotable.io через прокси
+        // Цитата с quotable.io через прокси api.allorigins.dev
         const quoteRes = await axios.get(
-          "https://api.allorigins.win/get?url=" +
+          "https://api.allorigins.dev/get?url=" +
             encodeURIComponent("https://api.quotable.io/random")
         );
         const quoteJson = JSON.parse(quoteRes.data.contents);
         setQuote(quoteJson.content);
 
-        // Анекдот с anekdot.ru через прокси
+        // Анекдот с anekdot.ru RSS через прокси api.allorigins.dev
         const jokeRes = await axios.get(
-          "https://api.allorigins.win/get?url=" +
+          "https://api.allorigins.dev/get?url=" +
             encodeURIComponent("https://www.anekdot.ru/rss/randomu.html")
         );
+
         const parser = new DOMParser();
-        const xml = parser.parseFromString(jokeRes.data.contents, "text/html");
-        const text =
-          xml.querySelector("item description")?.innerHTML ||
-          "Анекдот не найден";
+        // Обязательно парсим как XML, а не HTML
+        const xml = parser.parseFromString(
+          jokeRes.data.contents,
+          "application/xml"
+        );
+        const item = xml.querySelector("item");
+        let text = "Анекдот не найден";
+
+        if (item) {
+          const description = item.querySelector("description");
+          if (description) {
+            text = description.textContent || description.innerHTML;
+          }
+        }
+
         setJoke(text);
       } catch (err) {
         console.error("Ошибка при загрузке API:", err);
