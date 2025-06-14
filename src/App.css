@@ -1,63 +1,14 @@
-#root {
-  min-height: 100vh;
-  padding: 20px;
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: #f5f7fa;
   color: #333;
 }
 
-.App {
+.app {
   max-width: 600px;
   margin: 0 auto;
-}
-
-.info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.money, .weather-info {
-  background: white;
-  padding: 12px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  flex: 1;
-  min-width: 200px;
-}
-
-.list-header {
-  font-size: 22px;
-  margin: 20px 0;
-  color: #2c3e50;
-}
-
-.task {
-  background: white;
-  padding: 12px 15px;
-  border-radius: 6px;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.task-text {
-  flex-grow: 1;
-  cursor: pointer;
-  padding: 5px 0;
-}
-
-.task-text.done {
-  text-decoration: line-through;
-  color: #95a5a6;
-}
-
-.task-delete {
-  cursor: pointer;
-  color: #e74c3c;
-  font-weight: bold;
-  padding: 0 5px;
+  padding: 20px;
 }
 
 form {
@@ -86,7 +37,71 @@ button:hover {
   background: #2980b9;
 }
 
-.weather-icon {
-  vertical-align: middle;
-  margin-left: 5px;
+.tasks {
+  margin-bottom: 20px;
+}
+
+.task {
+  background: white;
+  padding: 12px 15px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.task-text {
+  flex-grow: 1;
+  cursor: pointer;
+  padding: 5px 0;
+}
+
+.task-text.done {
+  text-decoration: line-through;
+  color: #95a5a6;
+}
+
+.task-delete {
+  cursor: pointer;
+  color: #e74c3c;
+  font-weight: bold;
+  padding: 0 5px;
+}
+
+.info {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.animal-image {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 6px;
+}
+
+.animal-text {
+  margin-top: 10px;
+  font-style: italic;
+  color: #555;
+}
+
+.loading,
+.error {
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.loading {
+  background: #f1c40f;
+  color: #fff;
+}
+
+.error {
+  background: #e74c3c;
+  color: #fff;
 }

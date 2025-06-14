@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import "./App.css";
 import axios from "axios";
+import "./App.css";
 
 function App() {
   const [tasks, setTasks] = useState([]);
-  const [quote, setQuote] = useState("");
-  const [joke, setJoke] = useState("");
+  const [catImage, setCatImage] = useState("");
+  const [randomText, setRandomText] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -22,44 +22,19 @@ function App() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   }, [tasks]);
 
-  // Загрузка цитаты и анекдота
+  // Загрузка данных с API
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Цитата с quotable.io через прокси api.allorigins.dev
-        const quoteRes = await axios.get(
-          "https://api.allorigins.dev/get?url=" +
-            encodeURIComponent("https://api.quotable.io/random")
+        setCatImage("https://http.cat/404.jpg");
+
+        const textRes = await axios.get(
+          "https://baconipsum.com/api/?type=meat-and-filler&paras=1"
         );
-        const quoteJson = JSON.parse(quoteRes.data.contents);
-        setQuote(quoteJson.content);
-
-        // Анекдот с anekdot.ru RSS через прокси api.allorigins.dev
-        const jokeRes = await axios.get(
-          "https://api.allorigins.dev/get?url=" +
-            encodeURIComponent("https://www.anekdot.ru/rss/randomu.html")
-        );
-
-        const parser = new DOMParser();
-        // Обязательно парсим как XML, а не HTML
-        const xml = parser.parseFromString(
-          jokeRes.data.contents,
-          "application/xml"
-        );
-        const item = xml.querySelector("item");
-        let text = "Анекдот не найден";
-
-        if (item) {
-          const description = item.querySelector("description");
-          if (description) {
-            text = description.textContent || description.innerHTML;
-          }
-        }
-
-        setJoke(text);
+        setRandomText(textRes.data[0]);
       } catch (err) {
-        console.error("Ошибка при загрузке API:", err);
-        setError("Не удалось загрузить данные");
+        console.error("Ошибка при загрузке данных:", err);
+        setError("Не удалось загрузить данные.");
       } finally {
         setLoading(false);
       }
@@ -68,14 +43,9 @@ function App() {
     fetchData();
   }, []);
 
-  // Функции для задач
   const addTask = (text) => {
     if (text.trim()) {
-      const newTask = {
-        id: Date.now(),
-        text,
-        done: false,
-      };
+      const newTask = { id: Date.now(), text, done: false };
       setTasks([...tasks, newTask]);
     }
   };
@@ -96,18 +66,6 @@ function App() {
     <div className="app">
       <h1>Мои задачи ({tasks.length})</h1>
 
-      {!loading && !error && (
-        <div className="info">
-          <div>
-            <strong>🧠 Цитата дня:</strong> {quote}
-          </div>
-          <div>
-            <strong>😂 Анекдот:</strong>{" "}
-            <span dangerouslySetInnerHTML={{ __html: joke }} />
-          </div>
-        </div>
-      )}
-
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -121,14 +79,45 @@ function App() {
 
       <div className="tasks">
         {tasks.map((task) => (
-          <div key={task.id} className={`task ${task.done ? "done" : ""}`}>
-            <span onClick={() => toggleTask(task.id)}>{task.text}</span>
-            <button onClick={() => deleteTask(task.id)}>×</button>
+          <div key={task.id} className="task">
+            <span
+              onClick={() => toggleTask(task.id)}
+              className={`task-text ${task.done ? "done" : ""}`}
+            >
+              {task.text}
+            </span>
+            <button onClick={() => deleteTask(task.id)} className="task-delete">
+              ×
+            </button>
           </div>
         ))}
       </div>
 
-      {loading && <div>Загрузка...</div>}
+      {!loading && !error && (
+        <div className="info">
+          <div>
+            <strong>🐱 Картинка (HTTP кот):</strong>
+            <div style={{ marginTop: "10px" }}>
+              <img
+                src={catImage}
+                alt="HTTP Cat"
+                className="animal-image"
+                onError={(e) => {
+                  e.target.src =
+                    "https://placehold.co/200x200?text=Нет+изображения";
+                }}
+              />
+            </div>
+          </div>
+
+          <div style={{ marginTop: "20px" }}>
+            <strong>📝 Случайный текст:</strong>
+            <p className="animal-text">{randomText}</p>
+          </div>
+        </div>
+      )}
+
+      {loading && <div className="loading">Загрузка...</div>}
       {error && <div className="error">{error}</div>}
     </div>
   );
